@@ -34,7 +34,7 @@ public class SylverLogin {
            username = sc.next();
            password = sc.next();
            
-           sld.IsUnique(ID, username, password);
+           
            
            while(!password.equals(password2))
            {
@@ -44,7 +44,8 @@ public class SylverLogin {
 
            if(password.equals(password2))
            {
-            sld.AddData(ID, username, password);
+            sld.IsUnique(ID, username, password);
+            //sld.AddData(ID, username, password);
             
             System.out.println("Account successfully created!");
             break;
@@ -52,6 +53,7 @@ public class SylverLogin {
            
            else
            {
+               password2 = "";
                continue;
            }
 
