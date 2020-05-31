@@ -108,8 +108,8 @@ public class SylverLoginData {
         
         conn = DriverManager.getConnection(url, username, password);
         
-        while(true)
-        {
+       while(true)
+       {
         
         String SQLCode = "SELECT 1 FROM userlogininfo WHERE username = ?";
         
@@ -129,7 +129,7 @@ public class SylverLoginData {
                 {
         
                      AddData(ID, username2, password2);
-                     break;
+                   break;
                     
                 }
             }
@@ -184,9 +184,12 @@ public class SylverLoginData {
             
             try(ResultSet d = IsUnique.executeQuery())
             {
+                Integer PRow = d.getRow();
                 if(d.next())
                 {
-                   Integer PRow = d.getRow();
+                   
+                   PRow = d.getRow();
+                   
                     if(URow == PRow)
                     {
                     System.out.println("Password is correct. Welcome back, " + username2 + "!");
@@ -195,15 +198,15 @@ public class SylverLoginData {
                     
                     else
                     {
-                        System.out.println(URow + " " + PRow);
-                        System.out.println("Incorrect password. Please re-enter.");
+                        //System.out.println(URow + " " + PRow);
+                        System.out.println("Wrong password. Please re-enter.");
                         password2 = s.next();
                     }
                 }
                 
                 else
                 {
-                    
+                    System.out.println(URow + " " + PRow);
                     System.out.println("Incorrect password. Please re-enter.");
                     password2 = s.next();
                 }                   
