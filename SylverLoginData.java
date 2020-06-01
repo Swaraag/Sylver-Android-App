@@ -142,7 +142,6 @@ public class SylverLoginData {
     
     public Connection VerifyLogin(Integer ID, String username2, String password2) throws SQLException
     {
-        boolean b = true;
         Connection conn = null;
         PreparedStatement p = null;
         
@@ -150,7 +149,7 @@ public class SylverLoginData {
         
         Integer URow = 0;
         
-        while(b = true)
+        while(true)
         {
         String SQLCode = "SELECT 1 FROM userlogininfo WHERE username = ?";
 
@@ -165,32 +164,32 @@ public class SylverLoginData {
                     URow = d.getRow();
                     System.out.println("Username is correct.");
                     
+                    
                 }
                 
                 else
-                {
-                    
+                {    
                 System.out.println("Incorrect username. Please re-enter.");
                 username2 = s.next();
                 }
             }
             }
         
-                String SQLCode2 = "SELECT 1 FROM userlogininfo WHERE 'password' = ?";
+                String SQLCode2 = "SELECT password FROM userlogininfo WHERE username = '" + username2 + "' AND password = ?";
         
-        try(PreparedStatement IsUnique = conn.prepareStatement(SQLCode2))
-        {
+       try (PreparedStatement IsUnique = conn.prepareStatement(SQLCode2))
+       {
+            IsUnique.setString(1, username2);
             IsUnique.setString(1, password2);
             
-            try(ResultSet d = IsUnique.executeQuery())
-            {
-                Integer PRow = d.getRow();
+           try(ResultSet d = IsUnique.executeQuery())
+           {
+               
+                //Integer PRow = d.getRow();
                 if(d.next())
                 {
-                   
-                   PRow = d.getRow();
-                   
-                    if(URow == PRow)
+                    String password3 = d.getString(1);
+                    if(password3.equals(password2))
                     {
                     System.out.println("Password is correct. Welcome back, " + username2 + "!");
                     break;
@@ -198,18 +197,18 @@ public class SylverLoginData {
                     
                     else
                     {
-                        //System.out.println(URow + " " + PRow);
-                        System.out.println("Wrong password. Please re-enter.");
+                        System.out.println("Incorrect password. Please re enter.");
                         password2 = s.next();
                     }
+                    
+                    
                 }
                 
                 else
                 {
-                    System.out.println(URow + " " + PRow);
-                    System.out.println("Incorrect password. Please re-enter.");
-                    password2 = s.next();
-                }                   
+                   System.out.println("Wrong password. Please re-enter.");
+                   password2 = s.next();
+                }
             }
             }
         }
@@ -234,4 +233,7 @@ public class SylverLoginData {
 //https://hcmc.uvic.ca/blogs/index.php/how_to_fix_postgresql_error_duplicate_ke?blog=22, https://www.w3schools.com/sql/sql_ref_add_constraint.asp, https://docs.microsoft.com/en-us/sql/relational-databases/tables/modify-columns-database-engine?view=sql-server-ver15,
 //https://www.youtube.com/watch?v=-MAf4fb4cAQ, https://confluence.atlassian.com/bitbucketserverkb/duplicate-key-value-errors-in-logs-in-bitbucket-server-using-postgresql-979408650.html, https://dba.stackexchange.com/questions/60802/fixing-table-structure-to-avoid-error-duplicate-key-value-violates-unique-cons,
 //https://github.com/nextcloud/server/issues/6343, https://www.youtube.com/watch?v=eQu_kRlvinE, https://www.w3schools.com/sql/sql_datatypes.asp, https://www.geeksforgeeks.org/difference-between-primary-key-and-unique-key/, https://tshf.sas.com/techsup/download/hotfix/HF2/A4G.html#61126,
-//any other websites used but did not specifically check
+//any other websites used but did not specifically check, https://stackoverflow.com/questions/20074897/check-username-and-password-in-java-database-and-give-wrong-password-message-if, https://ramsis-code.blogspot.com/2013/09/how-to-validate-username-and-password.html,
+//https://stackoverflow.com/questions/11015023/user-login-by-comparing-with-user-details-in-database, https://stackoverflow.com/questions/22536960/how-to-compare-login-credentials-against-a-database-using-jdbc-postgresql/22554450,
+//https://stackoverflow.com/questions/36439305/error-the-column-index-is-out-of-range-1-number-of-columns-0, https://www.w3schools.com/sql/sql_and_or.asp, https://www.tutorialspoint.com/how-to-get-the-current-value-of-a-particular-row-from-a-database-using-jdbc,
+//https://stackoverflow.com/questions/22536960/how-to-compare-login-credentials-against-a-database-using-jdbc-postgresql/22554450
