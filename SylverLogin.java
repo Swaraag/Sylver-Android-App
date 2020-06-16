@@ -1,18 +1,23 @@
 package sylverlogin;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 import java.sql.SQLException;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.mail.MessagingException;
 
 public class SylverLogin {
 
-    public static void main(String[] args) throws SQLException
+    public static void main(String[] args) throws SQLException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, MessagingException
     {
        Scanner sc = new Scanner(System.in);
        System.out.println("Welcome to the Sylver Android companion app! Do you have an account?");
        String question = sc.next();
-       SylverLoginData sl = new SylverLoginData();
        SylverLoginData sld = new SylverLoginData();
-       Integer ID = 0;
        String username;
        String password;
        String password2 = "";
@@ -23,14 +28,12 @@ public class SylverLogin {
            System.out.println("Please sign in.");
            username = sc.next();
            password = sc.next();
-           sld.VerifyLogin(ID, username, password);
+           sld.VerifyLogin(username, password);
        }
        
        else if(question.equals("no"))
        {
-           ID = sl.GenerateID();
-           sl.getIDs().add(ID);
-           System.out.println("Thank you for creating an account! Your unique id is " + ID + ". Please keep this id in a safe place, since you will need it to login.\nPlease enter a username and password in that order.");
+           System.out.println("Thank you for creating an account!\nPlease enter a username and password in that order.");
            username = sc.next();
            password = sc.next();
            
@@ -44,8 +47,7 @@ public class SylverLogin {
 
            if(password.equals(password2))
            {
-            sld.IsUnique(ID, username, password);
-            //sld.AddData(ID, username, password);
+            sld.IsUnique(username, password);
             
             System.out.println("Account successfully created!");
             break;
