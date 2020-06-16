@@ -8,41 +8,35 @@ import java.sql.*;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.regex.Matcher; 
+import java.util.regex.Pattern; 
+import java.security.*;
+import java.security.interfaces.*;
+import javax.crypto.*;
+import java.security.spec.MGF1ParameterSpec;
+import java.util.Properties;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
+import javax.mail.*;
+import javax.mail.internet.*; 
+import javax.activation.*; 
+import javax.mail.Session; 
+import javax.mail.Transport; 
 
 public class SylverLoginData {
     private final String url = "jdbc:postgresql://localhost:5432/postgres";
     private final String username = "postgres";
     private final String password = "Sylver";
-    static ArrayList<Integer> IDs = new ArrayList();
     private String UserUsername;
     private String UserPassword;
     private Integer id;
     Scanner s = new Scanner(System.in);
-
     
     public SylverLoginData()
     {
         
     }
     
-    
-         // A generator to produce random integers for id
-    public Integer GenerateID() {
-        Random rand = new Random();
-        // Generates a random ID ranging from 1 to 1000000000
-        id = 1 + rand.nextInt(1000000000);
-
-        // Keep generating an ID till a unique ID is generated
-        while (IDs.contains(id)) {
-            id = 1 + rand.nextInt(1000000000);
-        }
-        return id;
-    }
-    
-    public ArrayList<Integer> getIDs()
-    {
-        return IDs;
-    }
     
     public String getUsername()
     {
@@ -64,11 +58,6 @@ public class SylverLoginData {
         UserPassword = p;
     }
     
-    public Integer getID()
-    {
-        return id;
-    }
-    
     public Connection connect()
     {
         Connection conn = null;
@@ -83,7 +72,54 @@ public class SylverLoginData {
         return conn;
     }
     
-    public Connection AddData(Integer id, String username2, String password2) throws SQLException
+    public static boolean ValidEmailCheck(String email) 
+    { 
+        String EmailCheck = "^[a-zA-Z0-9_+&*-]+(?:\\."+ 
+                            "[a-zA-Z0-9_+&*-]+)*@" + 
+                            "(?:[a-zA-Z0-9-]+\\.)+[a-z" + 
+                            "A-Z]{2,7}$"; 
+                              
+        Pattern pat = Pattern.compile(EmailCheck);
+        if (email == null)
+            return false; 
+        return pat.matcher(email).matches(); 
+    }
+    
+    public boolean VerifyAccount(String username2) throws AddressException, MessagingException
+    {
+        String recipient = username2;
+        String sender = "sylverappteam@gmail.com";
+        String host = "192.168.1.86";
+        String link = ""; //link coming soon, probably associated with the Python code written on the Anvil website
+        Properties properties = System.getProperties();
+        properties.setProperty("mail.smtp.host", host);
+        properties.put((String) "mail.smtp.port", "139");
+        Session session = Session.getInstance(properties);
+        boolean b = false;
+        
+      //try 
+      //{ 
+         MimeMessage message = new MimeMessage(session); 
+  
+         message.setFrom(new InternetAddress(sender));
+         message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient)); 
+         message.setSubject("Please verify your new Sylver account."); 
+         message.setText("Hi, " + username2 + ", you have created an accounter with Sylver. Please click this link to verify your acccount.\nBest,\nSylverAppTeam\nlink: " + link); 
+         Transport.send(message);
+         System.out.println("Mail successfully sent to " + username2 + ".");
+         b = true;
+     // }
+      
+      /*catch(MessagingException e)
+      {
+          e.printStackTrace();
+          b = false;
+      }
+      */
+      return b;
+    }
+    
+    public Connection AddData(String username2, String password2) throws SQLException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, MessagingException
     {
         Connection conn = null;
         
@@ -91,44 +127,122 @@ public class SylverLoginData {
         
         conn = DriverManager.getConnection(url, username, password);
         
-        p = conn.prepareStatement("INSERT INTO UserLoginInfo(userid, username, password) VALUES(?, ?, ?)");
+       /* KeyPairGenerator kID = KeyPairGenerator.getInstance("RSA");
+        KeyPairGenerator kUsername = KeyPairGenerator.getInstance("RSA");
+        KeyPairGenerator kPassword = KeyPairGenerator.getInstance("RSA");
+        KeyPair ku = kUsername.generateKeyPair();
+        KeyPair kp = kPassword.generateKeyPair();
+        KeyPair ki = kID.generateKeyPair();
         
-       p.setInt(1, id);
-       p.setString(2, username2);
-       p.setString(3, password2);
-       p.executeUpdate();
+        PublicKey pUsername = ku.getPublic();
+        PublicKey pPassword = kp.getPublic();
+        PublicKey pID = ki.getPublic();
+        
+        kUsername.initialize(900);
+        kPassword.initialize(900);
+        kID.initialize(900);
+        
+        Cipher c = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+        c.init(Cipher.ENCRYPT_MODE, pUsername);
+        c.init(Cipher.ENCRYPT_MODE, pPassword);
+        c.init(Cipher.ENCRYPT_MODE, pID);
+        
+        
+        byte UsernameConversion[] = username2.getBytes();
+        byte PasswordConversion[] = password2.getBytes();
+        byte IDConversion[] = new byte[1];
+        IDConversion[0] = id.byteValue();
+        c.update(UsernameConversion);
+        c.update(PasswordConversion);
+        c.update(IDConversion);
+        
+        byte UsernameConversionFinal[] = c.doFinal();
+        byte PasswordConversionFinal[] = c.doFinal();
+        byte IDConversionFinal[] = c.doFinal();
+
+        */
+        
+        //p = conn.prepareStatement("INSERT INTO UserLogin2(userid, username, password) VALUES(?, ?, ?)");
+        boolean b = VerifyAccount(username2);
+        
+        if(b = true)
+        {
+        p = conn.prepareStatement("INSERT INTO userlogininfo(username, password) VALUES(?, ?)");
+        //p.setBytes(1, IDConversionFinal);
+       // p.setBytes(2, UsernameConversionFinal);
+       // p.setBytes(3, PasswordConversionFinal);
+        
+        //p.setInt(1, id);
+        p.setString(1, username2);
+        p.setString(2, password2);
+        
+        p.executeUpdate();
+        }
+        
+        else
+        {
+            System.out.println("Please verify your account.");
+        }
        
         return conn;
     }
     
-    public Connection IsUnique(Integer ID, String username2, String password2) throws SQLException
+    public Connection IsUnique(String username2, String password2) throws SQLException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, MessagingException
     {
         Connection conn = null;
         PreparedStatement p = null;
         
         conn = DriverManager.getConnection(url, username, password);
         
+       /* KeyPairGenerator kUsername = KeyPairGenerator.getInstance("RSA");
+        KeyPair ku = kUsername.generateKeyPair();
+                
+        RSAPrivateKey pUsername = (RSAPrivateKey) ku.getPrivate();
+        
+        kUsername.initialize(512);
+        
+        Cipher x = Cipher.getInstance("RSA/ECB/PKCS1PADDING");
+        x.init(Cipher.DECRYPT_MODE, pUsername);
+        
+         byte[] UsernameConversion = new byte[100];
+        
+         x.update(UsernameConversion);
+        
+         byte UsernameConversionFinal[] = x.doFinal();
+
+*/
+       
+       
+        
        while(true)
        {
-        
+        //String SQLCode = "SELECT 1 FROM userlogin2 WHERE username = ?";
         String SQLCode = "SELECT 1 FROM userlogininfo WHERE username = ?";
+        
+        boolean verify = ValidEmailCheck(username2);
         
         try(PreparedStatement IsUnique = conn.prepareStatement(SQLCode))
         {
+            //IsUnique.setBytes(1, UsernameConversionFinal);
             IsUnique.setString(1, username2);
             
             try(ResultSet d = IsUnique.executeQuery())
             {
                 if(d.next())
                 {
-                    System.out.println("Username already exists. Please choose a different username.");
+                    System.out.println("An email is already associated with an account. Please choose a different email.");
                     username2 = s.next();
                 }
                 
-                else
+                else if(!d.next() && !verify)
                 {
-        
-                     AddData(ID, username2, password2);
+                    System.out.println("The email you entered is not in the correct format. Please try again.");
+                    username2 = s.next();
+                }
+                
+                else if(!d.next() && verify)
+                {
+                   AddData(username2, password2);
                    break;
                     
                 }
@@ -140,31 +254,60 @@ public class SylverLoginData {
        return conn; 
     }
     
-    public Connection VerifyLogin(Integer ID, String username2, String password2) throws SQLException
+    public Connection VerifyLogin(String username2, String password2) throws SQLException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException
     {
         Connection conn = null;
         PreparedStatement p = null;
         
         conn = DriverManager.getConnection(url, username, password);
+
+        /*KeyPairGenerator kUsername = KeyPairGenerator.getInstance("RSA");
+        KeyPairGenerator kPassword = KeyPairGenerator.getInstance("RSA");
+        KeyPair ku = kUsername.generateKeyPair();
+        KeyPair kp = kPassword.generateKeyPair();
+                
+        RSAPrivateKey pUsername = (RSAPrivateKey) ku.getPrivate();
+        RSAPrivateKey pPassword = (RSAPrivateKey) kp.getPrivate();
         
-        Integer URow = 0;
+        //kUsername.initialize(512);
+        //kPassword.initialize(512);
+        
+        
+        
+        Cipher x = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
+        //x.init(Cipher.DECRYPT_MODE, pUsername);
+        //x.init(Cipher.DECRYPT_MODE, pPassword);
+        
+        OAEPParameterSpec oaepParamsUsername = new OAEPParameterSpec("SHA-256", "MGF1", new MGF1ParameterSpec("SHA-256"), PSource.PSpecified.DEFAULT);
+        x.init(Cipher.DECRYPT_MODE, pUsername, oaepParamsUsername);
+        
+        OAEPParameterSpec oaepParamsPassword = new OAEPParameterSpec("SHA-256", "MGF1", new MGF1ParameterSpec("SHA-256"), PSource.PSpecified.DEFAULT);
+        x.init(Cipher.DECRYPT_MODE, pPassword, oaepParamsPassword);
+        
+        byte UsernameConversion[] = new byte[100];
+        byte PasswordConversion[] = new byte[100];
+        
+        x.update(UsernameConversion);
+        x.update(PasswordConversion);
+        */
         
         while(true)
         {
+        //String SQLCode = "SELECT 1 FROM userlogin2 WHERE username = ?";
         String SQLCode = "SELECT 1 FROM userlogininfo WHERE username = ?";
+        
+        boolean verify = ValidEmailCheck(username2);
 
         try(PreparedStatement IsUnique = conn.prepareStatement(SQLCode))
         {
+            //IsUnique.setBytes(1, UsernameConversion);
             IsUnique.setString(1, username2);
             
             try(ResultSet d = IsUnique.executeQuery())
             {
-                if(d.next())
+                if(d.next() && verify)
                 {
-                    URow = d.getRow();
                     System.out.println("Username is correct.");
-                    
-                    
                 }
                 
                 else
@@ -175,17 +318,19 @@ public class SylverLoginData {
             }
             }
         
+                //String SQLCode2 = "SELECT password FROM userlogin2 WHERE username = '" + username2 + "' AND password = ?";
                 String SQLCode2 = "SELECT password FROM userlogininfo WHERE username = '" + username2 + "' AND password = ?";
         
        try (PreparedStatement IsUnique = conn.prepareStatement(SQLCode2))
        {
+            //IsUnique.setBytes(1, UsernameConversion);
+            //IsUnique.setBytes(1, PasswordConversion);
+            
             IsUnique.setString(1, username2);
             IsUnique.setString(1, password2);
             
            try(ResultSet d = IsUnique.executeQuery())
            {
-               
-                //Integer PRow = d.getRow();
                 if(d.next())
                 {
                     String password3 = d.getString(1);
@@ -236,4 +381,14 @@ public class SylverLoginData {
 //any other websites used but did not specifically check, https://stackoverflow.com/questions/20074897/check-username-and-password-in-java-database-and-give-wrong-password-message-if, https://ramsis-code.blogspot.com/2013/09/how-to-validate-username-and-password.html,
 //https://stackoverflow.com/questions/11015023/user-login-by-comparing-with-user-details-in-database, https://stackoverflow.com/questions/22536960/how-to-compare-login-credentials-against-a-database-using-jdbc-postgresql/22554450,
 //https://stackoverflow.com/questions/36439305/error-the-column-index-is-out-of-range-1-number-of-columns-0, https://www.w3schools.com/sql/sql_and_or.asp, https://www.tutorialspoint.com/how-to-get-the-current-value-of-a-particular-row-from-a-database-using-jdbc,
-//https://stackoverflow.com/questions/22536960/how-to-compare-login-credentials-against-a-database-using-jdbc-postgresql/22554450
+//https://stackoverflow.com/questions/22536960/how-to-compare-login-credentials-against-a-database-using-jdbc-postgresql/22554450, https://www.tutorialspoint.com/java_cryptography/java_cryptography_encrypting_data.htm,
+//https://www.postgresql.org/docs/7.3/jdbc-binary-data.html, https://stackoverflow.com/questions/12803298/encrypt-a-string-save-it-to-db-load-it-and-decrypt-it, https://www.quickprogrammingtips.com/java/how-to-encrypt-and-decrypt-data-in-java-using-aes-algorithm.html,
+//https://stackoverflow.com/questions/14085333/rsa-encryption-decryption-badpaddingexception-data-must-start-with-zero, https://stackoverflow.com/questions/31944374/badpaddingexception-decryption-error, https://stackoverflow.com/questions/24658939/decrypt-pbe-encrypted-passwords-with-postgres-sql,
+//https://www.codeproject.com/Questions/828838/Rsa-Encryption-And-Decryption-Getting-Error-When-I, https://github.com/metabase/metabase/issues/5632, https://stackoverflow.com/questions/21285165/how-to-store-byte-from-java-into-a-bytea-in-postgresql,
+//https://www.devglan.com/java8/rsa-encryption-decryption-java, https://stackoverflow.com/questions/27918511/error-operator-does-not-exist-character-varying-bytea?rq=1, https://medium.com/@PrakhashS/javax-crypto-badpaddingexception-analyzing-related-root-causes-9b81ebda21b1,
+//https://github.com/randombit/botan/issues/1225, https://groups.google.com/forum/#!topic/activate-persistence/jtSKUtJvgIU, https://www.geeksforgeeks.org/check-email-address-valid-not-java/, https://www.geeksforgeeks.org/send-email-using-java-program/,
+//https://netbeans.org/kb/74/java/project-setup.html#projects-configuring, https://www.sparkpost.com/blog/what-smtp-port/#:~:text=Ports%2025%2C%20465%2C%20587%2C%20or%202525%20for%20SMTP%20have,be%20considered%20for%20modern%20use.,
+//https://stackoverflow.com/questions/12901475/javamail-api-to-imail-java-net-socketexception-permission-denied-connect, https://stackoverflow.com/questions/7477712/sending-email-using-jsp/7478027#7478027, https://stackoverflow.com/questions/5190730/mail-sending-problem,
+//https://stackoverflow.com/questions/585599/whats-causing-my-java-net-socketexception-connection-reset, https://www.tutorialspoint.com/javamail_api/javamail_api_smtp_servers.htm, https://kb.netgear.com/20878/Finding-your-IP-address-without-using-the-command-prompt,
+//https://stackoverflow.com/questions/8771167/how-to-change-javamail-port, https://stackoverflow.com/questions/6484275/java-net-unknownhostexception-invalid-hostname-for-server-local, https://java.databasedevelop.com/article/11851490/JMS,
+//https://stackoverflow.com/questions/5659325/getting-javax-mail-messagingexception-and-java-net-socketexception
