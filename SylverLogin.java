@@ -1,5 +1,6 @@
 package sylverlogin;
 
+import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -9,10 +10,11 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 
 public class SylverLogin {
 
-    public static void main(String[] args) throws SQLException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, MessagingException
+    public static void main(String[] args) throws SQLException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, MessagingException, AddressException, IOException
     {
        Scanner sc = new Scanner(System.in);
        System.out.println("Welcome to the Sylver Android companion app! Do you have an account?");
