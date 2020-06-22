@@ -1,6 +1,12 @@
 
 package sylverlogin;
 
+import static com.sun.corba.se.spi.presentation.rmi.StubAdapter.request;
+import com.sun.net.httpserver.HttpServer;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.URL;
 import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -21,9 +27,15 @@ import javax.mail.*;
 import javax.mail.internet.*; 
 import javax.activation.*; 
 import javax.mail.Session; 
-import javax.mail.Transport; 
+import javax.mail.Transport;
+import javax.servlet.Servlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.*;
+import java.net.URLConnection;
 
-public class SylverLoginData {
+public class SylverLoginData extends HttpServlet {
     private final String url = "jdbc:postgresql://localhost:5432/postgres";
     private final String username = "postgres";
     private final String password = "Sylver";
@@ -31,10 +43,11 @@ public class SylverLoginData {
     private String UserPassword;
     private Integer id;
     Scanner s = new Scanner(System.in);
+    HttpServletResponse response;
     
     public SylverLoginData()
     {
-        
+        super();
     }
     
     
@@ -85,41 +98,60 @@ public class SylverLoginData {
         return pat.matcher(email).matches(); 
     }
     
-    public boolean VerifyAccount(String username2) throws AddressException, MessagingException
+    public boolean VerifyAccount(String username2) throws AddressException, MessagingException, IOException, NullPointerException
     {
+        /*
         String recipient = username2;
         String sender = "sylverappteam@gmail.com";
-        String host = "192.168.1.86";
+        String host = "192.168.1.88";
         String link = ""; //link coming soon, probably associated with the Python code written on the Anvil website
         Properties properties = System.getProperties();
         properties.setProperty("mail.smtp.host", host);
+        ServerSocket socket = new ServerSocket();
+        socket.bind(socket.getLocalSocketAddress(), 139);
         properties.put((String) "mail.smtp.port", "139");
         Session session = Session.getInstance(properties);
-        boolean b = false;
+        */
         
-      //try 
-      //{ 
-         MimeMessage message = new MimeMessage(session); 
-  
-         message.setFrom(new InternetAddress(sender));
-         message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient)); 
-         message.setSubject("Please verify your new Sylver account."); 
-         message.setText("Hi, " + username2 + ", you have created an accounter with Sylver. Please click this link to verify your acccount.\nBest,\nSylverAppTeam\nlink: " + link); 
-         Transport.send(message);
-         System.out.println("Mail successfully sent to " + username2 + ".");
-         b = true;
-     // }
+        boolean b = false;
+       /* HttpServletResponse response2 = this.response;
+        response2.setContentType("text/html");
+        response2.sendRedirect("https://sylverapp.anvil.app");
+      */
+       
+       
+        b = true;
+        
+        /*
+        
+        try
+        {
+            MimeMessage message = new MimeMessage(session);
+
+            message.setFrom(new InternetAddress(sender));
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+            message.setSubject("Please verify your new Sylver account.");
+            message.setText("Hi, " + username2 + ", you have created an accounter with Sylver. Please click this link to verify your acccount.\nBest,\nSylverAppTeam\nlink: " + link);
+            socket.accept();
+            Transport.send(message);
+            socket.close();
+            System.out.println("Mail successfully sent to " + username2 + ".");
+            b = true;
+        }
       
-      /*catch(MessagingException e)
+      catch(MessagingException e)
       {
           e.printStackTrace();
           b = false;
       }
       */
+        
+      //redirection code goes here
+        
       return b;
     }
     
-    public Connection AddData(String username2, String password2) throws SQLException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, MessagingException
+    public Connection AddData(String username2, String password2) throws SQLException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, MessagingException, AddressException, IOException
     {
         Connection conn = null;
         
@@ -187,7 +219,7 @@ public class SylverLoginData {
         return conn;
     }
     
-    public Connection IsUnique(String username2, String password2) throws SQLException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, MessagingException
+    public Connection IsUnique(String username2, String password2) throws SQLException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, MessagingException, AddressException, IOException
     {
         Connection conn = null;
         PreparedStatement p = null;
@@ -391,4 +423,11 @@ public class SylverLoginData {
 //https://stackoverflow.com/questions/12901475/javamail-api-to-imail-java-net-socketexception-permission-denied-connect, https://stackoverflow.com/questions/7477712/sending-email-using-jsp/7478027#7478027, https://stackoverflow.com/questions/5190730/mail-sending-problem,
 //https://stackoverflow.com/questions/585599/whats-causing-my-java-net-socketexception-connection-reset, https://www.tutorialspoint.com/javamail_api/javamail_api_smtp_servers.htm, https://kb.netgear.com/20878/Finding-your-IP-address-without-using-the-command-prompt,
 //https://stackoverflow.com/questions/8771167/how-to-change-javamail-port, https://stackoverflow.com/questions/6484275/java-net-unknownhostexception-invalid-hostname-for-server-local, https://java.databasedevelop.com/article/11851490/JMS,
-//https://stackoverflow.com/questions/5659325/getting-javax-mail-messagingexception-and-java-net-socketexception
+//https://stackoverflow.com/questions/5659325/getting-javax-mail-messagingexception-and-java-net-socketexception, https://docs.microsoft.com/en-us/office365/enterprise/urls-and-ip-address-ranges, https://stackoverflow.com/questions/8051863/how-can-i-close-the-socket-in-a-proper-way,
+//https://www.edureka.co/community/7308/how-does-java-net-socketexception-connection-reset-happen, http://hc.apache.org/httpcomponents-client-ga/tutorial/html/fundamentals.htmlhttps://stackoverflow.com/questions/3913502/restful-call-in-java,
+//https://support.tibco.com/s/article/How-to-resolve-java-net-SocketException-Connection-reset-exception-with-Invoke-REST-API-activity, https://download.oracle.com/otndocs/jcp/servlet-3.0-fr-eval-oth-JSpec/, https://stackoverflow.com/questions/13951127/servletexception-httpservletresponse-and-httpservletrequest-cannot-be-resolved,
+//https://docs.oracle.com/javaee/6/api/javax/servlet/http/package-tree.html, https://stackoverflow.com/questions/8276897/java-nullpointerexception-on-httpservletresponse-line, https://docs.oracle.com/javaee/7/api/javax/faces/context/FacesContext.html,
+//https://stackoverflow.com/questions/25443247/how-to-check-link-is-already-clicked-in-java, https://www.codejava.net/java-ee/servlet/how-to-send-redirect-from-java-servlet, https://stackoverflow.com/questions/11721622/how-do-i-pass-the-httpservletrequest-object-to-the-test-case, https://www.codota.com/code/java/classes/javax.servlet.http.HttpServlet
+//https://stackoverflow.com/questions/8557490/redirect-to-a-different-url, https://examples.javacodegeeks.com/enterprise-java/servlet/java-servlet-sendredirect-example/#:~:text=The%20sendRedirect()%20method%20of%20HttpServletResponse%20interface%20can%20be%20used,inside%20and%20outside%20the%20server.,
+//https://smallbusiness.chron.com/redirect-new-url-servlet-50862.html, https://stackoverflow.com/questions/30027912/how-can-i-get-httpservletrequest-and-httpservletresponse-object-in-spring-aop, https://www.javatpoint.com/sendRedirect()-method, https://docs.oracle.com/javase/8/docs/api/java/net/URLConnection.html#getURL--,
+//https://docs.oracle.com/javase/8/docs/api/java/net/URLConnection.html, https://stackoverflow.com/questions/2236413/how-to-redirect-to-particular-url-while-clicking-on-button-in-android
