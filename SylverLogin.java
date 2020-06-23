@@ -13,6 +13,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 
 public class SylverLogin {
+static String username;
 
     public static void main(String[] args) throws SQLException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, MessagingException, AddressException, IOException
     {
@@ -20,17 +21,93 @@ public class SylverLogin {
        System.out.println("Welcome to the Sylver Android companion app! Do you have an account?");
        String question = sc.next();
        SylverLoginData sld = new SylverLoginData();
-       String username;
        String password;
        String password2 = "";
        sld.connect();
+       Chat c = new Chat();
        
        if(question.equals("yes"))
        {
            System.out.println("Please sign in.");
            username = sc.next();
            password = sc.next();
-           sld.VerifyLogin(username, password);
+           //sld.VerifyLogin(username, password);
+           boolean b = sld.VerifyLogin(username, password);
+           
+           if(b = true)
+           {
+               
+               while(true)
+               {
+               System.out.println("What would you like to do?");
+               String question2 = sc.next();
+
+               if(question2.equals("chat"))
+               {
+                   System.out.println("How would you like to chat?");
+                   String question3 = sc.next();
+                   
+                   if(question3.equals("create"))
+                   {
+                       c.CreateChat();
+                       
+                       Chat.UserInvites.add(username);
+                       
+                       String input = "";
+
+                       while (true)
+                       {
+                           if(!input.equals("leave"))
+                           {
+                           input = sc.next();
+                           System.out.println(username + ": " + input);
+                           }
+
+                           else if (input.equals("leave"))
+                           {
+                               break;
+                           }
+                       }
+                   }
+                   
+                   else if(question3.equals("join"))
+                   {
+                       boolean d = c.JoinChat();
+                       
+                        if (d = true)
+                        {
+                           System.out.println("Password accepted! Welcome to " + username + "'s chat room! You can begin chatting here.");
+                           String input = "";
+
+                            while (true)
+                            {
+                                if (!input.equals("leave"))
+                                {
+                                    input = sc.next();
+                                    System.out.println(username + ": " + input);
+                                }
+                                
+                                else if (input.equals("leave"))
+                                {
+                                    break;
+                                }
+                            }
+                       }
+                        
+                       else if (d = false)
+                       {
+                           System.out.println("Password is incorrect. Please try again.");
+                       }
+                    }
+                }
+               
+               else if(question2.equals("exit"))
+               {
+                   System.out.println("Thank you for using the Sylver Android App! Have a nice day!");
+                   System.exit(0);
+               }
+           }
+           }
        }
        
        else if(question.equals("no"))
