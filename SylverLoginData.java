@@ -3,9 +3,12 @@ package sylverlogin;
 
 import static com.sun.corba.se.spi.presentation.rmi.StubAdapter.request;
 import com.sun.net.httpserver.HttpServer;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URL;
 import java.sql.DriverManager;
 import java.sql.Connection;
@@ -47,7 +50,7 @@ public class SylverLoginData extends HttpServlet {
     
     public SylverLoginData()
     {
-        super();
+        //super();
     }
     
     
@@ -286,10 +289,11 @@ public class SylverLoginData extends HttpServlet {
        return conn; 
     }
     
-    public Connection VerifyLogin(String username2, String password2) throws SQLException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException
+    public boolean VerifyLogin(String username2, String password2) throws SQLException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException
     {
         Connection conn = null;
         PreparedStatement p = null;
+        boolean b = false;
         
         conn = DriverManager.getConnection(url, username, password);
 
@@ -369,6 +373,7 @@ public class SylverLoginData extends HttpServlet {
                     if(password3.equals(password2))
                     {
                     System.out.println("Password is correct. Welcome back, " + username2 + "!");
+                    b = true;
                     break;
                     }
                     
@@ -376,6 +381,7 @@ public class SylverLoginData extends HttpServlet {
                     {
                         System.out.println("Incorrect password. Please re enter.");
                         password2 = s.next();
+                        b = false;
                     }
                     
                     
@@ -385,11 +391,12 @@ public class SylverLoginData extends HttpServlet {
                 {
                    System.out.println("Wrong password. Please re-enter.");
                    password2 = s.next();
+                   b = false;
                 }
             }
             }
         }
-        return conn;
+        return b;
     }
     }
      
@@ -430,4 +437,4 @@ public class SylverLoginData extends HttpServlet {
 //https://stackoverflow.com/questions/25443247/how-to-check-link-is-already-clicked-in-java, https://www.codejava.net/java-ee/servlet/how-to-send-redirect-from-java-servlet, https://stackoverflow.com/questions/11721622/how-do-i-pass-the-httpservletrequest-object-to-the-test-case, https://www.codota.com/code/java/classes/javax.servlet.http.HttpServlet
 //https://stackoverflow.com/questions/8557490/redirect-to-a-different-url, https://examples.javacodegeeks.com/enterprise-java/servlet/java-servlet-sendredirect-example/#:~:text=The%20sendRedirect()%20method%20of%20HttpServletResponse%20interface%20can%20be%20used,inside%20and%20outside%20the%20server.,
 //https://smallbusiness.chron.com/redirect-new-url-servlet-50862.html, https://stackoverflow.com/questions/30027912/how-can-i-get-httpservletrequest-and-httpservletresponse-object-in-spring-aop, https://www.javatpoint.com/sendRedirect()-method, https://docs.oracle.com/javase/8/docs/api/java/net/URLConnection.html#getURL--,
-//https://docs.oracle.com/javase/8/docs/api/java/net/URLConnection.html, https://stackoverflow.com/questions/2236413/how-to-redirect-to-particular-url-while-clicking-on-button-in-android
+//https://docs.oracle.com/javase/8/docs/api/java/net/URLConnection.html, https://stackoverflow.com/questions/2236413/how-to-redirect-to-particular-url-while-clicking-on-button-in-android, https://www.instructables.com/id/Creating-a-Chat-Server-Using-Java/
