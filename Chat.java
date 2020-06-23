@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 
 public class Chat implements Runnable
@@ -18,6 +19,12 @@ private BufferedReader br2;
 static ArrayList<Chat> ClientList = new ArrayList<>();
 static Socket socket;
 static ServerSocket socket2;
+Scanner sc = new Scanner(System.in);
+static ArrayList<String> UserInvites = new ArrayList();
+static ArrayList<String> PasswordInvites = new ArrayList(); //corresponding password to each chat invite that the user receives
+String password = "";
+SylverLoginData sld = new SylverLoginData();
+
 
 public Chat()
 {
@@ -50,7 +57,40 @@ public Chat(ServerSocket s) throws IOException
             }
         }
     }
+    
+    public void CreateChat()
+    {
+        System.out.println("Please enter a password, which will be used for other users to join your chat.");
+        password = sc.next();
+        
+        System.out.println("Chat room password successfully created. The password for this chat room is " + password + ".");
+        PasswordInvites.add(password);
+    }
+    
+    public boolean JoinChat()
+    {
+        boolean b = false;
+            
+        System.out.println("Please enter a password, so you can join a chat.");
+        String password2 = sc.next();
 
+        for(String s: PasswordInvites)
+        {
+            if(!password2.equals(s))
+            {
+                b = false;
+            }
+            
+            else if(password2.equals(s))
+            {
+                b = true;
+                break;
+            }
+        }
+        return b;
+    }
+
+    /*
     public void CreateChat() throws IOException
     {
         int port = 139;
@@ -80,6 +120,9 @@ public Chat(ServerSocket s) throws IOException
                 i.printStackTrace();
             }
         }
+
+
+
         
         catch(Exception e)
         {
@@ -87,6 +130,8 @@ public Chat(ServerSocket s) throws IOException
             System.exit(1);
         }
     }
+
+*/
     
         @Override
     public void run()
@@ -108,6 +153,10 @@ public Chat(ServerSocket s) throws IOException
                     for(Chat cc: ClientList)
                     {
                         cc.getWriter().write(input);
+                        if(input.equals("finished chatting"))
+                        {
+                            socket.close();
+                        }
                     }
                 }
             }
