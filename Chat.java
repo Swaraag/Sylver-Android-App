@@ -76,18 +76,23 @@ public Chat(ServerSocket s) throws IOException
 
         for(String s: PasswordInvites)
         {
-            if(!password2.equals(s))
+            if(password2.equals(s))
+            {
+                b = true;
+            }
+            
+            else if (!password2.equals(s))
             {
                 b = false;
             }
-            
-            else if(password2.equals(s))
-            {
-                b = true;
-                break;
-            }
         }
         return b;
+    }
+    
+    public void ViewChatInvites()
+    {
+        System.out.println("Users creating their own chat room: " + UserInvites);
+        System.out.println("Passwords for these chat rooms: " + PasswordInvites);
     }
 
     /*
