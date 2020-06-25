@@ -36,7 +36,6 @@ static String username;
            
            if(b = true)
            {
-               
                while(true)
                {
                System.out.println("What would you like to do?");
@@ -60,6 +59,7 @@ static String username;
                            if(!input.equals("leave"))
                            {
                            input = sc.next();
+                           input = input.replaceAll("\\s", "");
                            System.out.println(username + ": " + input);
                            }
 
@@ -74,7 +74,12 @@ static String username;
                    {
                        boolean d = c.JoinChat();
                        
-                        if (d = true)
+                       if (d = false)
+                       {
+                           System.out.println("Password is incorrect. Please try again.");
+                       }
+                       
+                       else if (d = true)
                         {
                            System.out.println("Password accepted! Welcome to " + username + "'s chat room! You can begin chatting here.");
                            String input = "";
@@ -84,6 +89,7 @@ static String username;
                                 if (!input.equals("leave"))
                                 {
                                     input = sc.next();
+                                    input = input.replaceAll("\\s", "");
                                     System.out.println(username + ": " + input);
                                 }
                                 
@@ -93,13 +99,13 @@ static String username;
                                 }
                             }
                        }
-                        
-                       else if (d = false)
-                       {
-                           System.out.println("Password is incorrect. Please try again.");
-                       }
                     }
                 }
+               
+                   else if(question2.equals("invites"))
+                   {
+                       c.ViewChatInvites();
+                   }
                
                else if(question2.equals("exit"))
                {
@@ -151,4 +157,4 @@ static String username;
 
 
 //sources: https://www.geeksforgeeks.org/generating-random-numbers-in-java/, https://www.homeandlearn.co.uk/java/connect_to_a_database_using_java_code.html, https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-usagenotes-connect-drivermanager.html,
-//https://www.w3schools.com/sql/sql_ref_add_constraint.asp
+//https://www.w3schools.com/sql/sql_ref_add_constraint.asp, https://javarevisited.blogspot.com/2014/04/how-to-replace-line-breaks-new-lines-windows-mac-linux.html, https://stackoverflow.com/questions/43027078/prevent-going-to-next-line-after-input-in-console
